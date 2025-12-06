@@ -7,7 +7,8 @@ defmodule RideFast.Accounts.User do
     field :email, :string
     field :phone, :string
     field :password_hash, :string
-    field :role, Ecto.Enum, values: [:passenger, :admin], default: :passenger
+    field :role, Ecto.Enum, values: [:user, :admin], default: :user
+    field :password, :string, virtual: true
 
     has_many :rides, RideFast.Operations.Ride
     has_many :ratings_given, RideFast.Operations.Rating, foreign_key: :from_user_id
@@ -18,9 +19,27 @@ defmodule RideFast.Accounts.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:name, :email, :phone, :password_hash, :role])
-    |> validate_required([:name, :email, :phone, :password_hash])
+|> cast(attrs, [:name, :email, :phone, :password, :role])
+    |> validate_required([:name, :email, :password])
     |> unique_constraint(:email)
-    |> put_change(:role, :passenger)
+    |> put_change(:role, :user)
+    |> put_password_hash()
+  end
+
+  def admin_changeset(user, attrs) do
+  user
+  |> cast(attrs, [:name, :email, :phone, :password, :role])
+  |> validate_required([:name, :email, :password])
+  |> unique_constraint(:email)
+  |> put_change(:role, :admin)
+  |> put_password_hash()
+end
+
+  defp put_password_hash(changeset) do
+    case get_change(changeset, :password) do
+      nil -> changeset
+      password ->
+        put_change(changeset, :password_hash, Bcrypt.hash_pwd_salt(password))
+    end
   end
 end

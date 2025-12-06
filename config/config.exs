@@ -61,7 +61,7 @@ config :logger, :default_formatter,
 config :phoenix, :json_library, Jason
 
 config :ride_fast, RideFast.Repo,
-  username: "usuario_principal",
+  username: "root",
   password: "LuizVitor@12345",
   hostname: "127.0.0.1",
   database: "fastride",

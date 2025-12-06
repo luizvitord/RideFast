@@ -2,7 +2,7 @@ import Config
 
 # Configure your database
 config :ride_fast, RideFast.Repo,
-  username: "usuario_principal",
+  username: "root",
   password: "LuizVitor@12345",
   hostname: "127.0.0.1",
   database: "fastride",
@@ -88,8 +88,7 @@ config :phoenix_live_view,
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
 
-config :ride_fast, Guardian,
+config :ride_fast, RideFast.Auth.Guardian,
   issuer: "RideFast",
   secret_key: "C4crCJFvKwY1UFqI5cTg_2WABR6Mo15RFRgeCsQoOYxL7eO54V60SNSH_QS3mT0f",
-  ttl: {30, :days}, # Tempo de vida do token
-  serializer: RideFast.Auth.GuardianSerializer
+  ttl: {30, :days}

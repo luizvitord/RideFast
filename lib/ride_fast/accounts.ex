@@ -202,11 +202,17 @@ defmodule RideFast.Accounts do
     create_driver(attrs)
   end
 
-  def register_member(%{"role" => "passenger"} = attrs) do
+  def register_member(%{"role" => "user"} = attrs) do
     create_user(attrs)
   end
 
   def register_member(_attrs), do: {:error, :invalid_role}
+
+  def create_admin(attrs) do
+    %User{}
+    |> User.admin_changeset(attrs)
+    |> Repo.insert()
+  end
 
   def get_user_by_email(email) do
     Repo.get_by(User, email: email)
@@ -230,4 +236,40 @@ defmodule RideFast.Accounts do
         {:error, :unauthorized}
     end
   end
+
+  def list_users(params) do
+    search_term = params["q"]
+    page = String.to_integer(params["page"] || "1")
+    size = String.to_integer(params["size"] || "10")
+    offset = (page - 1) * size
+
+    query = from u in User, where: u.role == :user
+
+    query =
+      if search_term && search_term != "" do
+        search_pattern = "%#{search_term}%"
+        from u in query,
+          where: like(u.name, ^search_pattern) or like(u.email, ^search_pattern)
+      else
+        query
+      end
+
+    total_entries = Repo.aggregate(query, :count, :id)
+
+    entries =
+      query
+      |> limit(^size)
+      |> offset(^offset)
+      |> order_by(desc: :inserted_at)
+      |> Repo.all()
+
+    %{
+      entries: entries,
+      page_number: page,
+      page_size: size,
+      total_entries: total_entries,
+      total_pages: ceil(total_entries / size)
+    }
+  end
+
 end

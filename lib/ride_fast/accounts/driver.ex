@@ -9,6 +9,7 @@ defmodule RideFast.Accounts.Driver do
     field :password_hash, :string
     field :status, :string
     field :role, Ecto.Enum, values: [:driver], default: :driver
+    field :password, :string, virtual: true
 
     has_one :profile, RideFast.Accounts.DriverProfile
 
@@ -25,9 +26,19 @@ defmodule RideFast.Accounts.Driver do
   @doc false
   def changeset(driver, attrs) do
     driver
-    |> cast(attrs, [:name, :email, :phone, :password_hash, :status, :role])
-    |> validate_required([:name, :email, :phone, :password_hash, :status])
+    |> cast(attrs, [:name, :email, :phone, :password, :status, :role])
+    |> validate_required([:name, :email, :phone, :password])
     |> unique_constraint(:email)
     |> put_change(:role, :driver)
+    |> put_password_hash()
   end
+
+  defp put_password_hash(changeset) do
+    case get_change(changeset, :password) do # <--- Se não há campo virtual, isso falha
+      nil -> changeset
+      password ->
+        put_change(changeset, :password_hash, Bcrypt.hash_pwd_salt(password))
+    end
+  end
+
 end
