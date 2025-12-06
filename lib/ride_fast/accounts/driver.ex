@@ -8,6 +8,7 @@ defmodule RideFast.Accounts.Driver do
     field :phone, :string
     field :password_hash, :string
     field :status, :string
+    field :role, Ecto.Enum, values: [:driver], default: :driver
 
     has_one :profile, RideFast.Accounts.DriverProfile
 
@@ -24,8 +25,9 @@ defmodule RideFast.Accounts.Driver do
   @doc false
   def changeset(driver, attrs) do
     driver
-    |> cast(attrs, [:name, :email, :phone, :password_hash, :status])
+    |> cast(attrs, [:name, :email, :phone, :password_hash, :status, :role])
     |> validate_required([:name, :email, :phone, :password_hash, :status])
     |> unique_constraint(:email)
+    |> put_change(:role, :driver)
   end
 end

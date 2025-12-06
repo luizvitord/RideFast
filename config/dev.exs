@@ -87,3 +87,9 @@ config :phoenix_live_view,
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
+
+config :ride_fast, Guardian,
+  issuer: "RideFast",
+  secret_key: "C4crCJFvKwY1UFqI5cTg_2WABR6Mo15RFRgeCsQoOYxL7eO54V60SNSH_QS3mT0f",
+  ttl: {30, :days}, # Tempo de vida do token
+  serializer: RideFast.Auth.GuardianSerializer

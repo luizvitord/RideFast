@@ -12,18 +12,23 @@ defmodule RideFastWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug Guardian.Plug.VerifySession, claims: %{"typ" => "user"}
+    plug Guardian.Plug.VerifyHeader, realm: "Bearer"
+    plug Guardian.Plug.LoadResource, allow_nil: true
   end
 
   scope "/", RideFastWeb do
     pipe_through :browser
-
-    get "/", PageController, :home
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", RideFastWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", RideFastWeb do
+     pipe_through :api
+     get "/ping", AuthController, :ping #testar conexão
+
+     post "/login", AuthController, :login
+
+  end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:ride_fast, :dev_routes) do

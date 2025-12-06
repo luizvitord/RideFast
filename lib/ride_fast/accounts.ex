@@ -197,4 +197,37 @@ defmodule RideFast.Accounts do
   def change_driver(%Driver{} = driver, attrs \\ %{}) do
     Driver.changeset(driver, attrs)
   end
+
+  def register_member(%{"role" => "driver"} = attrs) do
+    create_driver(attrs)
+  end
+
+  def register_member(%{"role" => "passenger"} = attrs) do
+    create_user(attrs)
+  end
+
+  def register_member(_attrs), do: {:error, :invalid_role}
+
+  def get_user_by_email(email) do
+    Repo.get_by(User, email: email)
+  end
+
+  def get_driver_by_email(email) do
+    Repo.get_by(Driver, email: email)
+  end
+
+  def authenticate_resource(email, password) do
+    user = get_user_by_email(email)
+    resource = user || get_driver_by_email(email)
+
+    cond do
+      resource && Bcrypt.verify_pass(password, resource.password_hash) ->
+        {:ok, resource}
+      resource ->
+        {:error, :unauthorized}
+      true ->
+        Bcrypt.no_user_verify()
+        {:error, :unauthorized}
+    end
+  end
 end

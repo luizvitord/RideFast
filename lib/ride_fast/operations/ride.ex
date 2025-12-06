@@ -7,7 +7,12 @@ defmodule RideFast.Operations.Ride do
     field :origin_lng, :float
     field :dest_lat, :float
     field :dest_lng, :float
-    field :status, :string
+    field :status, Ecto.Enum, values: [
+          :requested,
+          :accepted,
+          :in_progress,
+          :finished,
+        ], default: :requested
     field :requested_at, :naive_datetime
     field :started_at, :naive_datetime
     field :ended_at, :naive_datetime
