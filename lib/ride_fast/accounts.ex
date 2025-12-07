@@ -35,7 +35,11 @@ defmodule RideFast.Accounts do
       ** (Ecto.NoResultsError)
 
   """
-  def get_user!(id), do: Repo.get!(User, id)
+  def get_user!(id) do
+    User
+    |> where([u], is_nil(u.deleted_at))
+    |> Repo.get(id)
+  end
 
   @doc """
   Creates a user.
@@ -243,7 +247,9 @@ defmodule RideFast.Accounts do
     size = String.to_integer(params["size"] || "10")
     offset = (page - 1) * size
 
-    query = from u in User, where: u.role == :user
+    query = from u in User,
+      where: u.role == :user,
+      where: is_nil(u.deleted_at)
 
     query =
       if search_term && search_term != "" do
@@ -270,6 +276,16 @@ defmodule RideFast.Accounts do
       total_entries: total_entries,
       total_pages: ceil(total_entries / size)
     }
+  end
+
+  def soft_delete_user(%User{} = user) do
+    now = NaiveDateTime.utc_now()
+
+    truncated_now = NaiveDateTime.truncate(now, :second)
+
+    user
+    |> Ecto.Changeset.change(deleted_at: truncated_now)
+    |> Repo.update()
   end
 
 end

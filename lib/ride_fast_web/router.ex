@@ -39,6 +39,14 @@ defmodule RideFastWeb.Router do
     get "/ping", AuthController, :ping
     post "/register", AuthController, :register
     post "/login", AuthController, :login
+
+
+  #ROTA PÚBLICA - LANGUAGE
+  end
+  scope "/api/v1", RideFastWeb do
+    pipe_through :api_public
+
+    get "/languages", LanguageController, :index
   end
 
   # ROTAS ADMIN
@@ -73,7 +81,7 @@ defmodule RideFastWeb.Router do
     delete "/vehicles/:id", VehicleController, :delete
 
     # Languages
-    get "/languages", LanguageController, :index
+    post "/languages", LanguageController, :create
 
     # Driver Languages
     get "/drivers/:driver_id/languages", DriverLanguageController, :index

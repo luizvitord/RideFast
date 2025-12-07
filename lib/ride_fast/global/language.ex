@@ -6,6 +6,8 @@ defmodule RideFast.Global.Language do
     field :code, :string
     field :name, :string
 
+    many_to_many :drivers, RideFast.Accounts.Driver, join_through: RideFast.Global.DriverLanguage
+
     timestamps(type: :utc_datetime)
   end
 

@@ -23,4 +23,9 @@ defmodule RideFastWeb.UserJSON do
       inserted_at: user.inserted_at
     }
   end
+
+  def show(%{user: user}) do
+    %{data: data(user)}
+  end
+
 end

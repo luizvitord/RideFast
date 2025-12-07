@@ -9,6 +9,7 @@ defmodule RideFast.Accounts.User do
     field :password_hash, :string
     field :role, Ecto.Enum, values: [:user, :admin], default: :user
     field :password, :string, virtual: true
+    field :deleted_at, :naive_datetime
 
     has_many :rides, RideFast.Operations.Ride
     has_many :ratings_given, RideFast.Operations.Rating, foreign_key: :from_user_id
