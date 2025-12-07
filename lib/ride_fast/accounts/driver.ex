@@ -27,10 +27,19 @@ defmodule RideFast.Accounts.Driver do
   def changeset(driver, attrs) do
     driver
     |> cast(attrs, [:name, :email, :phone, :password, :status, :role])
-    |> validate_required([:name, :email, :phone, :password])
+    |> validate_required([:name, :email, :phone])
+    |> validate_password(attrs)
     |> unique_constraint(:email)
     |> put_change(:role, :driver)
     |> put_password_hash()
+  end
+
+  defp validate_password(changeset, attrs) do
+    if changeset.data.id == nil do
+      validate_required(changeset, [:password])
+    else
+      changeset
+    end
   end
 
   defp put_password_hash(changeset) do

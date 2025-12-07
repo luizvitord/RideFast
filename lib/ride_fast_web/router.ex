@@ -13,8 +13,7 @@ defmodule RideFastWeb.Router do
   pipeline :api do
     plug :accepts, ["json"]
     plug Guardian.Plug.Pipeline, module: RideFast.Auth.Guardian,
-                               error_handler: RideFastWeb.AuthErrorHandler
-
+                                 error_handler: RideFastWeb.AuthErrorHandler
     plug Guardian.Plug.VerifySession
     plug Guardian.Plug.VerifyHeader, realm: "Bearer"
     plug Guardian.Plug.LoadResource, allow_nil: false
@@ -30,37 +29,80 @@ defmodule RideFastWeb.Router do
 
   scope "/", RideFastWeb do
     pipe_through :browser
+    get "/", PageController, :home
   end
 
-  #rotas protegida
-  scope "/api/v1", RideFastWeb do
-     pipe_through [:api, :admin_check]
-
-    get "/users", UserController, :index
-  end
-
-  #rotas públicas
+  # ROTAS PÚBLICAS
   scope "/api/v1/auth", RideFastWeb do
     pipe_through :api_public
 
-    get "/ping", AuthController, :ping #testar conexão
-
+    get "/ping", AuthController, :ping
     post "/register", AuthController, :register
     post "/login", AuthController, :login
   end
 
-  # Enable LiveDashboard and Swoosh mailbox preview in development
+  # ROTAS ADMIN
+  scope "/api/v1", RideFastWeb do
+    pipe_through [:api, :admin_check]
+
+    get "/users", UserController, :index
+    post "/drivers", DriverController, :create
+    delete "/drivers/:id", DriverController, :delete
+    post "/languages", LanguageController, :create
+  end
+
+  # ROTAS PROTEGIDAS
+  scope "/api/v1", RideFastWeb do
+    pipe_through [:api]
+
+    # Users:
+    resources "/users", UserController, only: [:show, :update, :delete]
+
+    # Drivers
+    resources "/drivers", DriverController, only: [:index, :show, :update]
+
+    # Driver Profile
+    get "/drivers/:driver_id/profile", DriverProfileController, :show
+    post "/drivers/:driver_id/profile", DriverProfileController, :create
+    put "/drivers/:driver_id/profile", DriverProfileController, :update
+
+    # Vehicles
+    get "/drivers/:driver_id/vehicles", VehicleController, :index
+    post "/drivers/:driver_id/vehicles", VehicleController, :create
+    put "/vehicles/:id", VehicleController, :update
+    delete "/vehicles/:id", VehicleController, :delete
+
+    # Languages
+    get "/languages", LanguageController, :index
+
+    # Driver Languages
+    get "/drivers/:driver_id/languages", DriverLanguageController, :index
+    post "/drivers/:driver_id/languages", DriverLanguageController, :create
+    delete "/drivers/:driver_id/languages/:language_id", DriverLanguageController, :delete
+
+    # Rides
+    post "/rides", RideController, :create
+    get "/rides", RideController, :index
+    get "/rides/:id", RideController, :show
+    delete "/rides/:id", RideController, :delete
+
+    # Ações da Máquina de Estados
+    post "/rides/:id/accept", RideController, :accept
+    post "/rides/:id/start", RideController, :start
+    post "/rides/:id/complete", RideController, :complete
+    post "/rides/:id/cancel", RideController, :cancel
+    get "/rides/:id/history", RideController, :history
+
+    # Ratings
+    post "/rides/:id/ratings", RatingController, :create
+    get "/drivers/:driver_id/ratings", RatingController, :index_driver
+  end
+
   if Application.compile_env(:ride_fast, :dev_routes) do
-    # If you want to use the LiveDashboard in production, you should put
-    # it behind authentication and allow only admins to access it.
-    # If your application does not have an admins-only section yet,
-    # you can use Plug.BasicAuth to set up some basic authentication
-    # as long as you are also using SSL (which you should anyway).
     import Phoenix.LiveDashboard.Router
 
     scope "/dev" do
       pipe_through :browser
-
       live_dashboard "/dashboard", metrics: RideFastWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
