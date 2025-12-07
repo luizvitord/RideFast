@@ -16,7 +16,7 @@ defmodule RideFast.Fleet.Vehicle do
   @doc false
   def changeset(vehicle, attrs) do
     vehicle
-    |> cast(attrs, [:plate, :model, :color, :seats, :active])
-    |> validate_required([:plate, :model, :color, :seats, :active])
+    |> cast(attrs, [:plate, :model, :color, :seats, :active, :driver_id])
+    |> validate_required([:plate, :model, :color, :seats, :active, :driver_id])
   end
 end
