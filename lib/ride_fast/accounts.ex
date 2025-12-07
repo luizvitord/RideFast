@@ -5,8 +5,9 @@ defmodule RideFast.Accounts do
 
   import Ecto.Query, warn: false
   alias RideFast.Repo
-
   alias RideFast.Accounts.User
+  alias RideFast.Global.Language
+  alias RideFast.Global
 
   @doc """
   Returns the list of users.
@@ -286,6 +287,31 @@ defmodule RideFast.Accounts do
     user
     |> Ecto.Changeset.change(deleted_at: truncated_now)
     |> Repo.update()
+  end
+
+  def add_language_to_driver(driver_id, language_id) do
+    driver = Repo.get!(Driver, driver_id) |> Repo.preload(:languages)
+
+    language = Repo.get!(Language, language_id)
+
+    already_has? = Enum.any?(driver.languages, fn l -> l.id == language.id end)
+
+    if already_has? do
+      {:error, :conflict}
+    else
+      driver
+      |> Ecto.Changeset.change()
+      |> Ecto.Changeset.put_assoc(:languages, [language | driver.languages])
+      |> Repo.update()
+    end
+  end
+
+  def list_driver_languages(driver_id) do
+    driver = Repo.get!(Driver, driver_id)
+
+    driver = Repo.preload(driver, :languages)
+
+    driver.languages
   end
 
 end
