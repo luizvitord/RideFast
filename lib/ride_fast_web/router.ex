@@ -87,7 +87,6 @@ defmodule RideFastWeb.Router do
     get "/drivers/:driver_id/languages", DriverLanguageController, :index
     post "/drivers/:driver_id/languages/:language_id", DriverLanguageController, :create
     delete "/drivers/:driver_id/languages/:language_id", DriverLanguageController, :delete
-
     # Rides
     post "/rides", RideController, :create
     get "/rides", RideController, :index

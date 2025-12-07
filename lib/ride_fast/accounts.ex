@@ -331,4 +331,24 @@ defmodule RideFast.Accounts do
     |> Repo.update()
   end
 
+  def remove_language_from_driver(driver_id, language_id) do
+    driver = Repo.get!(Driver, driver_id) |> Repo.preload(:languages)
+
+    target_id = String.to_integer(language_id)
+
+    exists? = Enum.any?(driver.languages, fn l -> l.id == target_id end)
+
+    if exists? do
+      new_languages = Enum.reject(driver.languages, fn l -> l.id == target_id end)
+
+      driver
+      |> Ecto.Changeset.change()
+      |> Ecto.Changeset.put_assoc(:languages, new_languages)
+      |> Repo.update()
+    else
+      {:error, :not_found}
+    end
+  end
+
+
 end
