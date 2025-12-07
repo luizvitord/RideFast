@@ -80,9 +80,6 @@ defmodule RideFastWeb.Router do
     put "/vehicles/:id", VehicleController, :update
     delete "/vehicles/:id", VehicleController, :delete
 
-    # Languages
-    post "/languages", LanguageController, :create
-
     # Driver Languages
     get "/drivers/:driver_id/languages", DriverLanguageController, :index
     post "/drivers/:driver_id/languages/:language_id", DriverLanguageController, :create

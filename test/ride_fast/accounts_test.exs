@@ -79,6 +79,38 @@ defmodule RideFast.AccountsTest do
       user = user_fixture()
       assert %Ecto.Changeset{} = Accounts.change_user(user)
     end
+
+    test "authenticate_resource/2 with valid credentials returns the user" do
+      password = "login_password_123"
+      user = user_fixture(%{password: password})
+
+      assert {:ok, %User{} = authenticated_user} = Accounts.authenticate_resource(user.email, password)
+
+      assert authenticated_user.id == user.id
+      assert authenticated_user.email == user.email
+    end
+
+    test "authenticate_resource/2 with invalid password returns unauthorized" do
+      password = "correct_password"
+      user = user_fixture(%{password: password})
+
+      assert {:error, :unauthorized} = Accounts.authenticate_resource(user.email, "wrong_password")
+    end
+
+    test "authenticate_resource/2 with invalid email returns unauthorized" do
+      assert {:error, :unauthorized} = Accounts.authenticate_resource("non_existent@email.com", "any_password")
+    end
+
+    test "authenticate_resource/2 fails if user is soft deleted" do
+      password = "password_123"
+      user = user_fixture(%{password: password})
+
+      # 1. Deleta o usuário (Soft Delete)
+      {:ok, _deleted_user} = Accounts.soft_delete_user(user)
+
+      assert {:error, :unauthorized} = Accounts.authenticate_resource(user.email, password)
+    end
+
   end
 
   describe "drivers" do

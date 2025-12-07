@@ -1,20 +1,18 @@
 defmodule RideFast.GlobalFixtures do
   @moduledoc """
-  This module defines test helpers for creating
-  entities via the `RideFast.Global` context.
+  Helpers para testes do contexto Global.
   """
 
-  @doc """
-  Generate a language.
-  """
+  def unique_language_code, do: "PT-#{System.unique_integer([:positive])}"
+
   def language_fixture(attrs \\ %{}) do
-    {:ok, language} =
-      attrs
-      |> Enum.into(%{
-        code: "some code",
-        name: "some name"
-      })
-      |> RideFast.Global.create_language()
+    # Gera um código único se não for passado um
+    attrs = Enum.into(attrs, %{
+      code: unique_language_code(),
+      name: "Language Name"
+    })
+
+    {:ok, language} = RideFast.Global.create_language(attrs)
 
     language
   end

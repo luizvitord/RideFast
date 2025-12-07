@@ -7,7 +7,7 @@ import Config
 # Run `mix help test` for more information.
 config :ride_fast, RideFast.Repo,
   username: "root",
-  password: "4002",
+  password: "LuizVitor@12345",
   hostname: "127.0.0.1",
   database: "ride_fast_test#{System.get_env("MIX_TEST_PARTITION")}",  pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: System.schedulers_online() * 2
