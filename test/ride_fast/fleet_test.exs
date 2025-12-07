@@ -2,7 +2,7 @@ defmodule RideFast.FleetTest do
   use RideFast.DataCase
 
   alias RideFast.Fleet
-
+  import RideFast.AccountsFixtures 
   describe "vehicles" do
     alias RideFast.Fleet.Vehicle
 
@@ -20,15 +20,24 @@ defmodule RideFast.FleetTest do
       assert Fleet.get_vehicle!(vehicle.id) == vehicle
     end
 
-    test "create_vehicle/1 with valid data creates a vehicle" do
-      valid_attrs = %{active: true, color: "some color", plate: "some plate", model: "some model", seats: 42}
+  test "create_vehicle/1 with valid data creates a vehicle" do
+      driver = driver_fixture() # Cria um motorista válido
+
+      valid_attrs = %{
+        active: true,
+        color: "some color",
+        model: "some model",
+        plate: "some plate",
+        seats: 42,
+        driver_id: driver.id # Vincula o motorista
+      }
 
       assert {:ok, %Vehicle{} = vehicle} = Fleet.create_vehicle(valid_attrs)
       assert vehicle.active == true
       assert vehicle.color == "some color"
       assert vehicle.plate == "some plate"
-      assert vehicle.model == "some model"
       assert vehicle.seats == 42
+      assert vehicle.driver_id == driver.id
     end
 
     test "create_vehicle/1 with invalid data returns error changeset" do

@@ -7,10 +7,9 @@ import Config
 # Run `mix help test` for more information.
 config :ride_fast, RideFast.Repo,
   username: "root",
-  password: "",
-  hostname: "localhost",
-  database: "ride_fast_test#{System.get_env("MIX_TEST_PARTITION")}",
-  pool: Ecto.Adapters.SQL.Sandbox,
+  password: "4002",
+  hostname: "127.0.0.1",
+  database: "ride_fast_test#{System.get_env("MIX_TEST_PARTITION")}",  pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: System.schedulers_online() * 2
 
 # We don't run a server during test. If one is required,
@@ -35,3 +34,8 @@ config :phoenix, :plug_init_mode, :runtime
 # Enable helpful, but potentially expensive runtime checks
 config :phoenix_live_view,
   enable_expensive_runtime_checks: true
+
+config :ride_fast, RideFast.Auth.Guardian,
+issuer: "RideFast",
+secret_key: "C4crCJFvKwY1UFqI5cTg_2WABR6Mo15RFRgeCsQoOYxL7eO54V60SNSH_QS3mT0f",
+ttl: {30, :days}

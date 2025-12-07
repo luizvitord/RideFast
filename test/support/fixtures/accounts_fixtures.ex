@@ -7,7 +7,7 @@ defmodule RideFast.AccountsFixtures do
   @doc """
   Generate a unique user email.
   """
-  def unique_user_email, do: "some email#{System.unique_integer([:positive])}"
+  def unique_user_email, do: "user#{System.unique_integer([:positive])}@example.com"
 
   @doc """
   Generate a user.
@@ -17,9 +17,9 @@ defmodule RideFast.AccountsFixtures do
       attrs
       |> Enum.into(%{
         email: unique_user_email(),
-        name: "some name",
-        password_hash: "some password_hash",
-        phone: "some phone"
+        name: "Some User",
+        password: "secret_password_123", # <--- Mudou de password_hash para password
+        phone: "85999998888"
       })
       |> RideFast.Accounts.create_user()
 
@@ -29,7 +29,7 @@ defmodule RideFast.AccountsFixtures do
   @doc """
   Generate a unique driver email.
   """
-  def unique_driver_email, do: "some email#{System.unique_integer([:positive])}"
+  def unique_driver_email, do: "driver#{System.unique_integer([:positive])}@example.com"
 
   @doc """
   Generate a driver.
@@ -39,10 +39,10 @@ defmodule RideFast.AccountsFixtures do
       attrs
       |> Enum.into(%{
         email: unique_driver_email(),
-        name: "some name",
-        password_hash: "some password_hash",
-        phone: "some phone",
-        status: "some status"
+        name: "Some Driver",
+        password: "secret_password_123", # <--- Mudou de password_hash para password
+        phone: "85999997777",
+        status: "active"
       })
       |> RideFast.Accounts.create_driver()
 
