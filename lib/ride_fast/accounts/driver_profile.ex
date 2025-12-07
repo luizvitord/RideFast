@@ -14,7 +14,7 @@ defmodule RideFast.Accounts.DriverProfile do
   @doc false
   def changeset(driver_profile, attrs) do
     driver_profile
-    |> cast(attrs, [:license_number, :license_expiry, :background_check_ok])
-    |> validate_required([:license_number, :license_expiry, :background_check_ok])
+    |> cast(attrs, [:license_number, :license_expiry, :background_check_ok, :driver_id])
+    |> validate_required([:license_number, :license_expiry, :background_check_ok, :driver_id])
   end
 end

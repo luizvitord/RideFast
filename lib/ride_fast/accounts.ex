@@ -8,6 +8,7 @@ defmodule RideFast.Accounts do
   alias RideFast.Accounts.User
   alias RideFast.Global.Language
   alias RideFast.Global
+  alias RideFast.Accounts.DriverProfile
 
   @doc """
   Returns the list of users.
@@ -312,6 +313,22 @@ defmodule RideFast.Accounts do
     driver = Repo.preload(driver, :languages)
 
     driver.languages
+  end
+
+  def get_driver_profile_by_driver_id(driver_id) do
+    Repo.get_by(DriverProfile, driver_id: driver_id)
+  end
+
+  def create_driver_profile(attrs) do
+    %DriverProfile{}
+    |> DriverProfile.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def update_driver_profile(%DriverProfile{} = profile, attrs) do
+    profile
+    |> DriverProfile.changeset(attrs)
+    |> Repo.update()
   end
 
 end

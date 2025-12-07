@@ -7,22 +7,17 @@ defmodule RideFastWeb.RatingController do
   action_fallback RideFastWeb.FallbackController
 
   # POST /api/v1/rides/:id/ratings
-  # O parâmetro vem como "id" da URL, mas nós o vinculamos à variável ride_id
   def create(conn, %{"id" => ride_id, "score" => score, "comment" => comment}) do
     user = Guardian.Plug.current_resource(conn)
     ride = Operations.get_ride!(ride_id)
 
-    # Validações de Regra de Negócio
     cond do
-      # 1. Apenas passageiros (Users) podem criar avaliações neste modelo de banco
       user.role != :user ->
         conn |> put_status(:forbidden) |> json(%{error: "Apenas passageiros podem avaliar motoristas."})
 
-      # 2. O usuário deve ser o dono da corrida
       ride.user_id != user.id ->
         conn |> put_status(:forbidden) |> json(%{error: "Você não participou desta corrida."})
 
-      # 3. A corrida deve estar FINALIZADA
       ride.status != :finished ->
         conn |> put_status(:bad_request) |> json(%{error: "Apenas corridas finalizadas podem ser avaliadas."})
 
@@ -45,7 +40,6 @@ defmodule RideFastWeb.RatingController do
 
   # GET /api/v1/drivers/:driver_id/ratings
   def index_driver(conn, %{"driver_id" => driver_id}) do
-    # Filtra avaliações onde to_driver_id é igual ao parâmetro
     ratings =
       Operations.list_ratings()
       |> Enum.filter(fn r -> to_string(r.to_driver_id) == driver_id end)

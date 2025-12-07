@@ -26,11 +26,9 @@ defmodule RideFastWeb.RideJSON do
       requested_at: ride.requested_at,
       started_at: ride.started_at,
       ended_at: ride.ended_at,
-      # Campos de relacionamento (IDs)
       user_id: ride.user_id,
       driver_id: ride.driver_id,
       vehicle_id: ride.vehicle_id,
-      # Opcional: Dados expandidos se estiverem carregados (preload)
       driver: if(Ecto.assoc_loaded?(ride.driver) && ride.driver, do: %{name: ride.driver.name, id: ride.driver.id}, else: nil),
       vehicle: if(Ecto.assoc_loaded?(ride.vehicle) && ride.vehicle, do: %{plate: ride.vehicle.plate, model: ride.vehicle.model}, else: nil)
     }
