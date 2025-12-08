@@ -30,6 +30,13 @@ defmodule RideFast.Accounts do
     |> Repo.get!(id)
   end
 
+  #Função sem bang
+  def get_user(id) do
+    User
+    |> where([u], is_nil(u.deleted_at)) # Mantém a regra do Soft Delete
+    |> Repo.get(id) # <--- Note: Repo.get (sem exclamação)
+  end
+
   @doc """
   Creates a user.
   """
@@ -44,7 +51,7 @@ defmodule RideFast.Accounts do
   """
   def update_user(%User{} = user, attrs) do
     user
-    |> User.changeset(attrs)
+    |> User.update_changeset(attrs)
     |> Repo.update()
   end
 
@@ -157,7 +164,7 @@ defmodule RideFast.Accounts do
 
     query = from u in User,
       where: u.role == :user,
-      where: is_nil(u.deleted_at) 
+      where: is_nil(u.deleted_at)
 
     query =
       if search_term && search_term != "" do

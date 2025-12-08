@@ -15,7 +15,7 @@ defmodule RideFastWeb.UserController do
 
     if is_authorized do
       try do
-        user = Accounts.get_user!(id)
+        user = Accounts.get_user(id)
         render(conn, :show, user: user)
       rescue
         Ecto.NoResultsError ->
@@ -42,14 +42,14 @@ def update(conn, %{"id" => id} = params) do
       |> halt()
     end
 
-    case Accounts.get_user!(id) do
+    case Accounts.get_user(id) do
       nil ->
         conn
         |> put_status(:not_found)
         |> json(%{error: "Usuário não encontrado."})
 
       user ->
-        safe_params = Map.drop(params, ["id", "role", "password_hash"])
+        safe_params = Map.drop(params, ["id", "role", "password_hash", "inserted_at", "updated_at"])
 
         case Accounts.update_user(user, safe_params) do
           {:ok, updated_user} ->
@@ -81,7 +81,7 @@ def update(conn, %{"id" => id} = params) do
       |> halt()
     end
 
-    case Accounts.get_user!(id) do
+    case Accounts.get_user(id) do
       nil ->
         conn
         |> put_status(:not_found)

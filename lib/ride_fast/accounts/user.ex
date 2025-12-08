@@ -36,6 +36,15 @@ defmodule RideFast.Accounts.User do
   |> put_password_hash()
 end
 
+  def update_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:name, :email, :phone, :password])
+    |> validate_required([:name, :email])
+    |> validate_length(:password, min: 6)
+    |> unique_constraint(:email)
+    |> put_password_hash()
+  end
+
   defp put_password_hash(changeset) do
     case get_change(changeset, :password) do
       nil -> changeset
