@@ -1,6 +1,7 @@
 defmodule RideFast.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
+  alias RideFast.Accounts.Driver
 
   schema "users" do
     field :name, :string
@@ -11,8 +12,13 @@ defmodule RideFast.Accounts.User do
     field :password, :string, virtual: true
     field :deleted_at, :naive_datetime
 
+
     has_many :rides, RideFast.Operations.Ride
     has_many :ratings_given, RideFast.Operations.Rating, foreign_key: :from_user_id
+
+    many_to_many :favorite_drivers, Driver,
+      join_through: "user_favorite_drivers",
+      on_replace: :delete
 
     timestamps(type: :utc_datetime)
   end
@@ -20,7 +26,7 @@ defmodule RideFast.Accounts.User do
   @doc false
   def changeset(user, attrs) do
     user
-|> cast(attrs, [:name, :email, :phone, :password, :role])
+    |> cast(attrs, [:name, :email, :phone, :password, :role])
     |> validate_required([:name, :email, :password])
     |> unique_constraint(:email)
     |> put_change(:role, :user)

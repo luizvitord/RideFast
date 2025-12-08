@@ -1,6 +1,7 @@
 defmodule RideFast.Accounts.Driver do
   use Ecto.Schema
   import Ecto.Changeset
+  alias RideFast.Accounts.User
 
   schema "drivers" do
     field :name, :string
@@ -19,6 +20,9 @@ defmodule RideFast.Accounts.Driver do
     many_to_many :languages, RideFast.Global.Language,
       join_through: RideFast.Global.DriverLanguage,
       on_replace: :delete
+
+    many_to_many :favorited_by_users, User,
+      join_through: "user_favorite_drivers"
 
     timestamps(type: :utc_datetime)
   end
