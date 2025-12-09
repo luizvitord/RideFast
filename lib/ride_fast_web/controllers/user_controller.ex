@@ -14,14 +14,14 @@ defmodule RideFastWeb.UserController do
     is_authorized = current_user.role == :admin or to_string(current_user.id) == id
 
     if is_authorized do
-      try do
-        user = Accounts.get_user(id)
-        render(conn, :show, user: user)
-      rescue
-        Ecto.NoResultsError ->
-          conn
-          |> put_status(:not_found)
-          |> json(%{error: "Usuário não encontrado."})
+        case Accounts.get_user(id) do
+          nil ->
+            conn
+            |> put_status(:not_found)
+            |> json(%{error: "Usuário não encontrado."})
+
+        user ->
+          render(conn, :show, user: user)
       end
     else
       conn
@@ -35,37 +35,36 @@ def update(conn, %{"id" => id} = params) do
 
     is_authorized = current_user.role == :admin or to_string(current_user.id) == id
 
-    unless is_authorized do
+    if is_authorized do
+      case Accounts.get_user(id) do
+        nil ->
+          conn
+          |> put_status(:not_found)
+          |> json(%{error: "Usuário não encontrado."})
+
+        user ->
+          safe_params = Map.drop(params, ["id", "role", "password_hash", "inserted_at", "updated_at"])
+
+          case Accounts.update_user(user, safe_params) do
+            {:ok, updated_user} ->
+              render(conn, :show, user: updated_user)
+
+            {:error, changeset} ->
+              errors = Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->
+                Regex.replace(~r"%{(\w+)}", msg, fn _, key ->
+                  opts |> Keyword.get(String.to_existing_atom(key), key) |> to_string()
+                end)
+              end)
+
+              conn
+              |> put_status(:bad_request)
+              |> json(%{error: "Falha na atualização.", details: errors})
+          end
+      end
+    else
       conn
       |> put_status(:forbidden)
       |> json(%{error: "Acesso negado. Você só pode editar seu próprio perfil."})
-      |> halt()
-    end
-
-    case Accounts.get_user(id) do
-      nil ->
-        conn
-        |> put_status(:not_found)
-        |> json(%{error: "Usuário não encontrado."})
-
-      user ->
-        safe_params = Map.drop(params, ["id", "role", "password_hash", "inserted_at", "updated_at"])
-
-        case Accounts.update_user(user, safe_params) do
-          {:ok, updated_user} ->
-            render(conn, :show, user: updated_user)
-
-          {:error, changeset} ->
-            errors = Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->
-              Regex.replace(~r"%{(\w+)}", msg, fn _, key ->
-                opts |> Keyword.get(String.to_existing_atom(key), key) |> to_string()
-              end)
-            end)
-
-            conn
-            |> put_status(:bad_request)
-            |> json(%{error: "Falha na atualização.", details: errors})
-        end
     end
   end
 
