@@ -34,7 +34,7 @@ defmodule RideFastWeb.AuthController do
           end)
 
           conn
-          |> put_status(:unprocessable_entity)
+          |> put_status(:bad_request)
           |> json(%{errors: errors})
         end
 
