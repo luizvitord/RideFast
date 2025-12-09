@@ -115,11 +115,25 @@ defmodule RideFast.OperationsTest do
 
     @invalid_attrs %{comment: nil, score: nil}
 
-    test "create_rating/1 with valid data creates a rating" do
-      valid_attrs = %{comment: "some comment", score: 5}
+test "create_rating/1 with valid data creates a rating" do
+      user = user_fixture()
+      driver = driver_fixture()
+      vehicle = vehicle_fixture(%{driver_id: driver.id})
+      ride = ride_fixture(%{user_id: user.id, driver_id: driver.id, vehicle_id: vehicle.id, status: :finished})
+
+      valid_attrs = %{
+        comment: "some comment",
+        score: 5,
+        ride_id: ride.id,
+        from_user_id: user.id,
+        to_driver_id: driver.id
+      }
+
       assert {:ok, %Rating{} = rating} = Operations.create_rating(valid_attrs)
       assert rating.comment == "some comment"
       assert rating.score == 5
+      assert rating.ride_id == ride.id
+      assert rating.from_user_id == user.id
     end
   end
 end
