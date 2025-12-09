@@ -16,7 +16,7 @@ defmodule RideFast.Operations.Rating do
   @doc false
   def changeset(rating, attrs) do
     rating
-    |> cast(attrs, [:score, :comment])
-    |> validate_required([:score, :comment])
+    |> cast(attrs, [:score, :comment, :ride_id, :from_user_id, :to_driver_id])
+    |> validate_required([:score, :comment, :ride_id, :from_user_id, :to_driver_id])
   end
 end
